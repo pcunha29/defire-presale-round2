@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import '~antd/dist/antd.css';
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
+
+.customGradient {
+  background: repeating-linear-gradient(20deg, #00262e, #021b22 1px, #00262e 5px, #333 5px);
+}
+
+@layer components {
+  .field{
+    @apply h-11 text-xs shadow-lg text-gray-900 rounded-xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+    dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 disabled:bg-transparent disabled:border-0 disabled:hover:border-0
+  }
+  .main-button{
+    @apply bg-defire-light-purple text-xs font-bold text-defire-dark active:cursor-pointer active:hover:opacity-80 disabled:bg-transparent disabled:text-opacity-50  transition-all rounded-xl h-11 px-4 py-2 shadow-lg disabled:cursor-not-allowed
+  }
+}
