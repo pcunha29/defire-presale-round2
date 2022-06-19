@@ -1,7 +1,7 @@
 import defireTypography from "../../images/defireTypography.svg";
 
 function Navbar(props: any) {
-  const { setSelectedNetwork, reference } = props;
+  const { setSelectedNetwork, reference, loadWeb3Modal } = props;
 
   const handleSelect = (e: string) => {
     setSelectedNetwork(e);
@@ -20,22 +20,11 @@ function Navbar(props: any) {
         src={defireTypography}
         alt="Defire Typography Logo"
       />
-      <div className="flex flex-col sm:flex-row items-end sm:items-center w-96">
-        <label className=" text-sm font-medium text-gray-900 dark:text-gray-400">
-          Network:
-        </label>
-
-        <select
-          id="small"
-          className="w-32 px-2 ml-2 mt-4 sm:mt-0 field"
-          onChange={(e) => handleSelect(e.target.value)}
+      <div className="flex flex-col items-end w-96">
+        <button
+          className="main-button ml-2 w-32 mt-4 sm:mt-0"
+          onClick={loadWeb3Modal}
         >
-          <option value="AVAX">Avalanche</option>
-          <option value="FTM">Fantom</option>
-          <option value="MATIC">Polygon</option>
-        </select>
-
-        <button className="main-button ml-2 w-32 mt-4 sm:mt-0">
           Connect Wallet
         </button>
       </div>

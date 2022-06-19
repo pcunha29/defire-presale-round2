@@ -1,19 +1,66 @@
-import { useState, createRef } from "react";
+import { useState, createRef, useEffect, useCallback } from "react";
 import { Progress } from "antd";
 import Footer from "./components/navigation/footer";
 import Navbar from "./components/navigation/navbar";
 import Card from "./components/card";
 import InformationBanner from "./components/informationBanner";
 import MainLogo from "./components/mainLogo";
+import { Web3ModalSetup } from "./helpers";
 
 import defireIcon from "./images/defireIcon.svg";
 import gDEFIRE from "./images/gDEFIREIcon.svg";
 import USDC from "./images/usdc-logo.svg";
 
-function App() {
-  const [selectedNetwork, setSelectedNetwork] = useState("AVAX");
-  const reference = createRef();
+const web3Modal = Web3ModalSetup();
+const providers = [`https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`];
+const { ethers } = require("ethers");
 
+function App() {
+  const reference = createRef();
+  const [injectedProvider, setInjectedProvider] = useState();
+  const [address, setAddress] = useState();
+  const logoutOfWeb3Modal = async () => {
+    await web3Modal.clearCachedProvider();
+    if (
+      injectedProvider &&
+      injectedProvider.provider &&
+      typeof injectedProvider.provider.disconnect == "function"
+    ) {
+      await injectedProvider.provider.disconnect();
+    }
+    setTimeout(() => {
+      window.location.reload();
+    }, 1);
+  };
+
+  const loadWeb3Modal = useCallback(async () => {
+    const provider = await web3Modal.connect();
+    setInjectedProvider(new ethers.providers.Web3Provider(provider));
+
+    provider.on("chainChanged", (chainId: any) => {
+      console.log(`chain changed to ${chainId}! updating providers`);
+      setInjectedProvider(new ethers.providers.Web3Provider(provider));
+    });
+
+    provider.on("accountsChanged", () => {
+      console.log(`account changed!`);
+      setInjectedProvider(new ethers.providers.Web3Provider(provider));
+    });
+
+    // Subscribe to session disconnection
+    provider.on("disconnect", (code: any, reason: any) => {
+      console.log(code, reason);
+      logoutOfWeb3Modal();
+    });
+  }, [setInjectedProvider]);
+
+  useEffect(() => {
+    if (web3Modal.cachedProvider) {
+      loadWeb3Modal();
+    }
+  }, [loadWeb3Modal]);
+
+  //INFO THAT NEEDS TO BE Dynamic
   const topInformation = [
     { title: "My Flare amount:", amount: "12 FLARE", icon: gDEFIRE },
     { title: "My DFIRE Amount:", amount: "100 DEFIRE", icon: defireIcon },
@@ -50,7 +97,7 @@ function App() {
 
   return (
     <div className="font-SpaceGrotesk h-auto customGradient">
-      <Navbar reference={reference} setSelectedNetwork={setSelectedNetwork} />
+      <Navbar reference={reference} loadWeb3Modal={loadWeb3Modal} />
 
       <section className="container mt-20 h-auto">
         <MainLogo />
@@ -63,22 +110,11 @@ function App() {
         </div>
 
         <div ref={reference as React.RefObject<HTMLDivElement>} />
-        <div className="mt-32 sm:mt-64 mb-20 grid lg:grid-cols-3 lg:gap-14">
+        <div className="mt-32 sm:mt-64 mb-20 flex justify-center lg:gap-14">
           <Card
             swapDisabled={true}
-            selectedNetwork={selectedNetwork}
+            selectedNetwork={"MATIC"}
             network={"MATIC"}
-            reference={reference}
-          />
-          <Card
-            selectedNetwork={selectedNetwork}
-            network={"AVAX"}
-            reference={reference}
-          />
-          <Card
-            swapDisabled={true}
-            selectedNetwork={selectedNetwork}
-            network={"FTM"}
             reference={reference}
           />
         </div>
