@@ -1,18 +1,12 @@
 import defireTypography from "../../images/defireTypography.svg";
 
 function Navbar(props: any) {
-  const { setSelectedNetwork, reference, loadWeb3Modal } = props;
+  const {
+    connectWallet,
+    logoutWallet,
+    web3Modal,
+  } = props;
 
-  const handleSelect = (e: string) => {
-    setSelectedNetwork(e);
-    const ref = reference.current;
-    if (ref) {
-      ref.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  };
   return (
     <nav className="p-4 sm:p-7 flex justify-between w-full">
       <img
@@ -21,12 +15,21 @@ function Navbar(props: any) {
         alt="Defire Typography Logo"
       />
       <div className="flex flex-col items-end w-96">
-        <button
-          className="main-button ml-2 w-32 mt-4 sm:mt-0"
-          onClick={loadWeb3Modal}
-        >
-          Connect Wallet
-        </button>
+        {web3Modal && web3Modal.cachedProvider ? (
+          <button
+            className="main-button ml-2 w-32 mt-4 sm:mt-0"
+            onClick={logoutWallet}
+          >
+            Logout Wallet
+          </button>
+        ) : (
+          <button
+            className="main-button ml-2 w-32 mt-4 sm:mt-0"
+            onClick={connectWallet}
+          >
+            Connect Wallet
+          </button>
+        )}
       </div>
     </nav>
   );

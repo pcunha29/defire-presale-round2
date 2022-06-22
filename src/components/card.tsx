@@ -46,7 +46,7 @@ function Card(props: any) {
         </span>
       </div>
 
-      <div className="absolute top-0 sm:-top-32 flex justify-center w-full z-10">
+      <div className="absolute top-0 sm:-top-32 flex justify-center w-full z-2">
         <Progress
           //width={320}
           width={250}

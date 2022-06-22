@@ -1,39 +1,39 @@
-import { useState, createRef, useEffect, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Progress } from "antd";
+
 import Footer from "./components/navigation/footer";
 import Navbar from "./components/navigation/navbar";
 import Card from "./components/card";
 import InformationBanner from "./components/informationBanner";
-import MainLogo from "./components/mainLogo";
-import { Web3ModalSetup } from "./helpers";
 
+import Web3Modal from "web3modal";
+import { providerOptions } from "./helpers/providerOptions";
+
+import MainLogo from "./components/mainLogo";
 import defireIcon from "./images/defireIcon.svg";
 import gDEFIRE from "./images/gDEFIREIcon.svg";
 import USDC from "./images/usdc-logo.svg";
 
-const web3Modal = Web3ModalSetup();
-const providers = [`https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`];
 const { ethers } = require("ethers");
+const web3Modal = new Web3Modal({
+  cacheProvider: true,
+  theme: "light",
+  providerOptions, // required
+});
 
 function App() {
-  const reference = createRef();
   const [injectedProvider, setInjectedProvider] = useState();
-  const [address, setAddress] = useState();
-  const logoutOfWeb3Modal = async () => {
+
+  const logoutWallet = async () => {
+    console.log(injectedProvider);
     await web3Modal.clearCachedProvider();
-    if (
-      injectedProvider &&
-      injectedProvider.provider &&
-      typeof injectedProvider.provider.disconnect == "function"
-    ) {
-      await injectedProvider.provider.disconnect();
-    }
+
     setTimeout(() => {
       window.location.reload();
     }, 1);
   };
 
-  const loadWeb3Modal = useCallback(async () => {
+  const connectWallet = useCallback(async () => {
     const provider = await web3Modal.connect();
     setInjectedProvider(new ethers.providers.Web3Provider(provider));
 
@@ -50,15 +50,9 @@ function App() {
     // Subscribe to session disconnection
     provider.on("disconnect", (code: any, reason: any) => {
       console.log(code, reason);
-      logoutOfWeb3Modal();
+      logoutWallet();
     });
   }, [setInjectedProvider]);
-
-  useEffect(() => {
-    if (web3Modal.cachedProvider) {
-      loadWeb3Modal();
-    }
-  }, [loadWeb3Modal]);
 
   //INFO THAT NEEDS TO BE Dynamic
   const topInformation = [
@@ -97,7 +91,11 @@ function App() {
 
   return (
     <div className="font-SpaceGrotesk h-auto customGradient">
-      <Navbar reference={reference} loadWeb3Modal={loadWeb3Modal} />
+      <Navbar
+        web3Modal={web3Modal}
+        connectWallet={connectWallet}
+        logoutWallet={logoutWallet}
+      />
 
       <section className="container mt-20 h-auto">
         <MainLogo />
@@ -109,13 +107,11 @@ function App() {
             })}
         </div>
 
-        <div ref={reference as React.RefObject<HTMLDivElement>} />
         <div className="mt-32 sm:mt-64 mb-20 flex justify-center lg:gap-14">
           <Card
             swapDisabled={true}
             selectedNetwork={"MATIC"}
             network={"MATIC"}
-            reference={reference}
           />
         </div>
 
